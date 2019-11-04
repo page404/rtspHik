@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>rtspHik</title>
+    <link href="../../css/bootstrap.min.css" rel="stylesheet" />
+    <link href="bootstrap.css" rel="stylesheet" />
+    <script src="jquery.js"></script>
+    <script src="rtspStream.js"></script>
+    <style>
+        body {
+            max-width: 720px;
+            margin: 50px auto;
+        }
+
+        #test_video {
+            width: 720px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        input.input, .form-inline .input-group > .form-control {
+            width: 300px;
+        }
+
+        .logs {
+            overflow: auto;
+            width: 720px;
+            height: 150px;
+            padding: 5px;
+            border-top: solid 1px gray;
+            border-bottom: solid 1px gray;
+        }
+
+        button {
+            margin: 5px
+        }
+    </style>
+
+</head>
+<body>
+    <video id="test_video" controls autoplay></video>
+
+    <script>
+        var scrollStatPl = true;
+        var scrollStatWs = true;
+        var player_src = "";
+        player_src = "rtsp://aaa/bbb/ccc";
+        var console = (function (oldConsole) {
+            return {
+                log: function () {
+                    oldConsole.log(newConsole(arguments, "black", "#A9F5A9"));
+                },
+                info: function () {
+                    oldConsole.info(newConsole(arguments, "black", "#A9F5A9"));
+                },
+                warn: function () {
+                    oldConsole.warn(newConsole(arguments, "black", "#F3F781"));
+                },
+                error: function () {
+                    oldConsole.error(newConsole(arguments, "black", "#F5A9A9"));
+                }
+            };
+        }(window.console));
+
+        function newConsole(args, textColor, backColor) {
+            let text = '';
+            let node = document.createElement("div");
+            for (let arg in args) {
+                text += ' ' + args[arg];
+            }
+            node.appendChild(document.createTextNode(text));
+            node.style.color = textColor;
+            node.style.backgroundColor = backColor;
+            return text;
+        }
+
+        window.console = console;
+
+        function cleanLog(element) {
+            while (element.firstChild) {
+                element.removeChild(element.firstChild);
+            }
+        }
+
+        function autoscroll(element) {
+            if (scrollStatus(element)) {
+                element.scrollTop = element.scrollHeight;
+            }
+            if (element.childElementCount > 1000) {
+                element.removeChild(element.firstChild);
+            }
+        }
+
+        function scrollset(element, state) {
+            if (state) {
+                element.scrollTop = 0;
+                scrollChange(element, false);
+            } else {
+                element.scrollTop = element.scrollHeight;
+                scrollChange(element, true);
+            }
+        }
+
+        function scrollswitch(element) {
+            if (scrollStatus(element)) {
+                scrollChange(element, false);
+            } else {
+                scrollChange(element, true);
+            }
+        }
+
+        function scrollChange(element, status) {
+            if (scrollStatus(element)) {
+                scrollStatPl = false;
+                document.getElementById("scrollSetPl").innerText = "Scroll on";
+            } else {
+                scrollStatPl = true;
+                document.getElementById("scrollSetPl").innerText = "Scroll off";
+            }
+        }
+
+        function scrollStatus(element) {
+            if (element.id === "pllogs") {
+                return scrollStatPl;
+            } else {
+                return scrollStatWs;
+            }
+        }
+        var player = document.getElementById('test_video');
+        var rtspsource = document.createElement("source");
+        rtspsource.src = player_src;
+        player.appendChild(rtspsource);
+        Streamedian.player('test_video', { socket: "ws://localhost:12306/ws/" });  
+        var set_live = document.getElementById('to_end');
+        var range_out = document.getElementById('rate_res');
+    </script>
+</body>
+</html>
